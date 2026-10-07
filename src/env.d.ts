@@ -7,5 +7,6 @@
 declare const process: {
   env: {
     BURGER_API_URL: string;
+    NODE_ENV: 'development' | 'production' | 'test';
   };
 };
