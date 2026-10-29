@@ -18,6 +18,11 @@ const setupMocks = async (page: Page): Promise<void> => {
       domain: 'norma.education-services.ru',
       path: '/',
     },
+    {
+      name: 'accessToken',
+      value: 'Bearer mock-access-token',
+      url: 'http://localhost:4000',
+    },
   ]);
 
   await page.addInitScript(() => {
@@ -57,12 +62,20 @@ test.describe('Конструктор бургера', () => {
   test('в модалке отображаются данные ингредиента, по которому кликнули', async ({
     page,
   }) => {
-    await page.getByText('Краторная булка N-200i').first().click();
+    await page.getByText('Биокотлета из марсианской Магнолии').first().click();
 
-    await expect(page.getByRole('heading', { name: 'Детали ингредиента' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Краторная булка N-200i' })).toBeVisible();
-    await expect(page.getByText('420')).toBeVisible();
-    await expect(page.getByText('80')).toBeVisible();
+    const modal = page.locator('[class*="modal__modal"]');
+
+    await expect(
+      page.getByRole('heading', { name: 'Детали ингредиента' })
+    ).toBeVisible();
+    await expect(
+      modal.getByRole('heading', { name: 'Биокотлета из марсианской Магнолии' })
+    ).toBeVisible();
+    await expect(modal).toContainText('4242'); // калории
+    await expect(modal).toContainText('420'); // белки
+    await expect(modal).toContainText('142'); // жиры
+    await expect(modal).toContainText('242'); // углеводы
   });
 
   test('закрытие модалки ингредиента по крестику', async ({ page }) => {

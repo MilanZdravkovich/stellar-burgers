@@ -42,37 +42,20 @@ describe('ingredientsSlice', () => {
     });
   });
 
-  test('должен установить isLoading = true при pending', () => {
+  test('должен установить isLoading = true и сбросить ошибку при pending', () => {
+    const prevState = {
+      ingredients: [],
+      isLoading: false,
+      error: 'Предыдущая ошибка',
+    };
     const action = { type: fetchIngredients.pending.type };
-    const result = ingredientsReducer(undefined, action);
+    const result = ingredientsReducer(prevState, action);
 
     expect(result.isLoading).toBe(true);
     expect(result.error).toBeNull();
   });
 
-  test('должен сохранить данные при fulfilled', () => {
-    const action = {
-      type: fetchIngredients.fulfilled.type,
-      payload: mockIngredients,
-    };
-    const result = ingredientsReducer(undefined, action);
-
-    expect(result.isLoading).toBe(false);
-    expect(result.ingredients).toEqual(mockIngredients);
-  });
-
-  test('должен сохранить ошибку при rejected', () => {
-    const action = {
-      type: fetchIngredients.rejected.type,
-      error: { message: 'Ошибка сервера' },
-    };
-    const result = ingredientsReducer(undefined, action);
-
-    expect(result.isLoading).toBe(false);
-    expect(result.error).toBe('Ошибка сервера');
-  });
-
-  test('не должен мутировать предыдущее состояние при fulfilled', () => {
+  test('должен сохранить данные и завершить загрузку при fulfilled', () => {
     const prevState = {
       ingredients: [],
       isLoading: true,
@@ -84,7 +67,42 @@ describe('ingredientsSlice', () => {
     };
     const result = ingredientsReducer(prevState, action);
 
+    expect(result.isLoading).toBe(false);
+    expect(result.ingredients).toEqual(mockIngredients);
+  });
+
+  test('должен сохранить ошибку и завершить загрузку при rejected', () => {
+    const prevState = {
+      ingredients: [],
+      isLoading: true,
+      error: null,
+    };
+    const action = {
+      type: fetchIngredients.rejected.type,
+      error: { message: 'Ошибка сервера' },
+    };
+    const result = ingredientsReducer(prevState, action);
+
+    expect(result.isLoading).toBe(false);
+    expect(result.error).toBe('Ошибка сервера');
+  });
+
+  test('не должен мутировать предыдущее состояние при fulfilled', () => {
+    const prevState = {
+      ingredients: [],
+      isLoading: true,
+      error: 'старая ошибка',
+    };
+    const action = {
+      type: fetchIngredients.fulfilled.type,
+      payload: mockIngredients,
+    };
+    const result = ingredientsReducer(prevState, action);
+
     expect(result).not.toBe(prevState);
+    expect(result.isLoading).toBe(false);
+    expect(result.error).toBe('старая ошибка');
     expect(prevState.ingredients).toEqual([]);
+    expect(prevState.isLoading).toBe(true);
   });
 });

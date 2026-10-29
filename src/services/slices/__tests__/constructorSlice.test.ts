@@ -87,15 +87,25 @@ describe('constructorSlice', () => {
     expect(result.bun).toBeNull();
   });
 
-  test('должен удалить ингредиент по id', () => {
+  test('должен удалить ингредиент по id и сохранить остальные', () => {
+    const ingredient2: TConstructorIngredient = {
+      ...mockIngredient,
+      _id: '3',
+      name: 'Сыр',
+      id: 'ingredient-id-2',
+    };
+
     const prevState = {
       bun: null,
-      ingredients: [mockConstructorIngredient],
+      ingredients: [mockConstructorIngredient, ingredient2],
     };
+
     const action = removeIngredient('ingredient-id-1');
     const result = constructorReducer(prevState, action);
 
-    expect(result.ingredients).toEqual([]);
+    expect(result.ingredients).toHaveLength(1);
+    expect(result.ingredients[0].id).toBe('ingredient-id-2');
+    expect(result.ingredients[0].name).toBe('Сыр');
   });
 
   test('должен переместить ингредиент', () => {
