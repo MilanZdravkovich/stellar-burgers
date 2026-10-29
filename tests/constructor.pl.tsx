@@ -15,13 +15,14 @@ const setupMocks = async (page: Page): Promise<void> => {
     {
       name: 'accessToken',
       value: 'Bearer mock-access-token',
-      domain: 'norma.education-services.ru',
+      domain: 'localhost',
       path: '/',
     },
     {
       name: 'accessToken',
       value: 'Bearer mock-access-token',
-      url: 'http://localhost:4000',
+      domain: 'norma.education-services.ru',
+      path: '/',
     },
   ]);
 
@@ -64,11 +65,12 @@ test.describe('Конструктор бургера', () => {
   }) => {
     await page.getByText('Биокотлета из марсианской Магнолии').first().click();
 
-    const modal = page.locator('[class*="modal__modal"]');
-
     await expect(
       page.getByRole('heading', { name: 'Детали ингредиента' })
     ).toBeVisible();
+
+    const modal = page.locator('div[class*="modal__modal"]');
+
     await expect(
       modal.getByRole('heading', { name: 'Биокотлета из марсианской Магнолии' })
     ).toBeVisible();
